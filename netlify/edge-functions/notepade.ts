@@ -25,10 +25,17 @@ export default async (req: Request) => {
   }
 
   if (req.method === "GET") {
-    const id = new URL(req.url).searchParams.get("id") || "";
+    const searchParams = new URL(req.url).searchParams;
+    const id = searchParams.get("id") || "";
+    const subtype = searchParams.get("subtype") || "plain";
     try {
       const text = await get(id);
-      return new Response(text, { headers: corsHeaders });
+      return new Response(text, {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": `text/${subtype}; charset=utf-8`,
+        },
+      });
     } catch (err) {
       return errorResponse(err);
     }
