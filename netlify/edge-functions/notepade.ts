@@ -27,7 +27,7 @@ export default async (req: Request) => {
   if (req.method === "GET") {
     const searchParams = new URL(req.url).searchParams;
     const id = searchParams.get("id") || "";
-    const subtype = searchParams.get("subtype") || "plain";
+    const subtype = searchParams.get("subtype") || "html";
     try {
       const text = await get(id);
       return new Response(text, {
