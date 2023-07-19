@@ -5,7 +5,7 @@ const corsHeaders = {
 };
 
 function errorResponse(err: any) {
-  return new Response(err?.message || String(err), {
+  return new Response(err?.message || "Internal Error", {
     headers: corsHeaders,
     status: err.code || 500,
   });
@@ -93,4 +93,4 @@ export default async (req: Request) => {
   return errorResponse("invalid method");
 };
 
-export const config: Config = { path: "/" };
+export const config: Config = { path: "/api" };
