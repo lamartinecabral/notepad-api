@@ -29,7 +29,6 @@ function authHeader(req: Request) {
 export default async (req: Request) => {
   // This is needed if you're planning to invoke your function from a browser.
   if (req.method === "OPTIONS") {
-    console.log(req);
     return new Response("ok", { headers: corsHeaders });
   }
 
@@ -67,9 +66,13 @@ export default async (req: Request) => {
     const text = await req.text();
     try {
       const fetchUrl = firestoreApiUrl(id);
-      const fetchBody = {
-        fields: {} as any,
-      };
+      const fetchBody: {
+        fields: {
+          text?: { stringValue: string };
+          protected?: { stringValue: string };
+          public?: { booleanValue: boolean };
+        };
+      } = { fields: {} };
 
       fetchUrl.searchParams.set("updateMask.fieldPaths", field);
       if (field === "text") fetchBody.fields.text = { stringValue: text };
