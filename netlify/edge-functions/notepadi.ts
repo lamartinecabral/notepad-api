@@ -4,17 +4,25 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
 };
 
-function errorResponse(err: any) {
+function firestoreApiUrl(id: string) {
+  return new URL(
+    "https://firestore.googleapis.com/v1/" +
+      "projects/lamart-notepad/databases/(default)/documents/docs/" +
+      id
+  );
+}
+
+function errorResponse(err: { code?: number; message?: string }) {
   return new Response(err?.message || "Internal Error", {
     headers: corsHeaders,
-    status: err.code || 500,
+    status: err?.code || 500,
   });
 }
 
 function authHeader(req: Request) {
-  const headers: any = {};
+  const headers: { Authorization?: string } = {};
   if (req.headers.has("Authorization"))
-    headers["Authorization"] = req.headers.get("Authorization");
+    headers["Authorization"] = req.headers.get("Authorization") as string;
   return headers;
 }
 
@@ -32,9 +40,7 @@ export default async (req: Request) => {
     if (!id) return errorResponse({ message: "Bad Request", code: 400 });
 
     try {
-      const baseUrl = `https://firestore.googleapis.com/v1/projects/lamart-notepad/databases/(default)/documents/docs/`;
-
-      const text = await fetch(baseUrl + id, {
+      const text = await fetch(firestoreApiUrl(id), {
         method: "GET",
         headers: authHeader(req),
       })
@@ -60,9 +66,7 @@ export default async (req: Request) => {
     const field = new URL(req.url).searchParams.get("field") || "text";
     const text = await req.text();
     try {
-      const fetchUrl = new URL(
-        `https://firestore.googleapis.com/v1/projects/lamart-notepad/databases/(default)/documents/docs/${id}`
-      );
+      const fetchUrl = firestoreApiUrl(id);
       const fetchBody = {
         fields: {} as any,
       };
@@ -90,7 +94,7 @@ export default async (req: Request) => {
     }
   }
 
-  return errorResponse("invalid method");
+  return errorResponse({ message: "invalid method", code: 403 });
 };
 
 export const config: Config = { path: "/api" };
