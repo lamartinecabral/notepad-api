@@ -3,6 +3,6 @@
     "start": "netlify dev"
   },
   "devDependencies": {
-    "netlify-cli": "^15.8.0"
+    "netlify-cli": "^15.11.0"
   }
 }
