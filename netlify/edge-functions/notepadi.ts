@@ -2,6 +2,7 @@ import type { Config } from "https://edge.netlify.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Authorization",
 };
 
 function firestoreApiUrl(id: string) {
