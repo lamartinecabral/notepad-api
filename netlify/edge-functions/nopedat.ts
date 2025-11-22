@@ -56,7 +56,7 @@ export default async (req: Request) => {
           "Content-Type": `text/${subtype}; charset=utf-8`,
         },
       });
-    } catch (err) {
+    } catch (err: any) {
       return errorResponse(err);
     }
   }
@@ -93,7 +93,7 @@ export default async (req: Request) => {
         });
 
       return new Response("ok", { headers: corsHeaders });
-    } catch (err) {
+    } catch (err: any) {
       return errorResponse(err);
     }
   }
