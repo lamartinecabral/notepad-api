@@ -47,7 +47,8 @@ export default async (req: Request) => {
         .then((a) => {
           if (a.error) throw a.error;
           return a.fields.text.stringValue;
-        });
+        })
+        .then((a) => String(a).replace(/[\s;]+$/, ""));
 
       const result = await new Function(`return (${functionText})`)()(req);
 
