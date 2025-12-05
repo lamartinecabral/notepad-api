@@ -1,3 +1,4 @@
+import vm from "node:vm";
 import type { Config } from "https://edge.netlify.com";
 
 const defaultHeaders = {
@@ -27,6 +28,10 @@ function authHeader(req: Request) {
   return headers;
 }
 
+function vmContext() {
+  return vm.createContext({ ...globalThis });
+}
+
 export default async (req: Request) => {
   // This is needed if you're planning to invoke your function from a browser.
   if (req.method === "OPTIONS") {
@@ -39,7 +44,7 @@ export default async (req: Request) => {
     if (!id) return errorResponse({ message: "Bad Request", code: 400 });
 
     try {
-      const functionText = await fetch(firestoreApiUrl(id), {
+      const code = await fetch(firestoreApiUrl(id), {
         method: "GET",
         headers: authHeader(req),
       })
@@ -47,10 +52,15 @@ export default async (req: Request) => {
         .then((a) => {
           if (a.error) throw a.error;
           return a.fields.text.stringValue;
-        })
-        .then((a) => String(a).replace(/[\s;]+$/, ""));
+        });
 
-      const result = await new Function(`return (${functionText})`)()(req);
+      const lambda = vm.runInContext(code, vmContext());
+      let result;
+      if (lambda?.constructor?.name === "Function") {
+        result = await lambda(req);
+      } else {
+        result = lambda;
+      }
 
       if (result instanceof Response) {
         for (const [header, value] of Object.entries(defaultHeaders))
