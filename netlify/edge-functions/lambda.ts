@@ -56,7 +56,7 @@ export default async (req: Request) => {
       if (typeof lambda === "function") {
         result = await lambda(req);
       } else {
-        result = lambda;
+        result = await lambda;
       }
 
       if (result instanceof Response) {
