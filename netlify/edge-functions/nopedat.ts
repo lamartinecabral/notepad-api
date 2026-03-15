@@ -9,7 +9,7 @@ function firestoreApiUrl(id: string) {
   return new URL(
     "https://firestore.googleapis.com/v1/" +
       "projects/lamart-notepad/databases/(default)/documents/docs/" +
-      id
+      id,
   );
 }
 
@@ -36,7 +36,6 @@ export default async (req: Request) => {
   if (req.method === "GET") {
     const searchParams = new URL(req.url).searchParams;
     const id = searchParams.get("id");
-    const subtype = searchParams.get("subtype") || "plain";
     if (!id) return errorResponse({ message: "Bad Request", code: 400 });
 
     try {
@@ -49,6 +48,25 @@ export default async (req: Request) => {
           if (a.error) throw a.error;
           return a.fields.text.stringValue;
         });
+
+      const isImage = searchParams.get("image") !== null;
+      if (isImage) {
+        const dataUrl = text;
+        const [rest, base64Data] = dataUrl.split(",");
+        const contentType = rest.split(":")[1].split(";")[0];
+        const binaryData = Uint8Array.from(atob(base64Data), (c) =>
+          c.charCodeAt(0),
+        );
+        return new Response(binaryData, {
+          headers: {
+            ...corsHeaders,
+            "Content-Type": contentType,
+            "Content-Length": binaryData.byteLength.toString(),
+          },
+        });
+      }
+
+      const subtype = searchParams.get("subtype") || "plain";
 
       return new Response(text, {
         headers: {
