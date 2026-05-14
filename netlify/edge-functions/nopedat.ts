@@ -1,4 +1,4 @@
-import type { Config } from "https://edge.netlify.com";
+import type { Config } from "@netlify/edge-functions";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

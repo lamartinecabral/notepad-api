@@ -1,4 +1,4 @@
-import type { Config } from "https://edge.netlify.com";
+import type { Config } from "@netlify/edge-functions";
 
 const defaultHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,7 +9,7 @@ function firestoreApiUrl(id: string) {
   return new URL(
     "https://firestore.googleapis.com/v1/" +
       "projects/lamart-notepad/databases/(default)/documents/docs/" +
-      id
+      id,
   );
 }
 
